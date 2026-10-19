@@ -37,6 +37,6 @@ ros2 launch drone_gazebo_sim drone_sim.launch.py
 ## 节点说明
 
 - `drone_teleop`：键盘遥控节点
-- `drone_perception`：HSV颜色分割感知节点
+- `drone_perception`：YOLOv3-tiny 卷积神经网络目标检测感知节点（OpenCV DNN 加载模型，输入摄像头图像→输出目标位置）
 - `drone_controller`：PID目标跟踪控制器
 - `drone_bridge`：Gazebo物理桥接节点
