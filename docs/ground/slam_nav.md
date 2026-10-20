@@ -122,13 +122,7 @@ ros2 launch carla_slam_nav carla_nav2.launch.py
 
 > 录屏用 ScreenToGif，只录 RViz + 模拟器，压到 10MB 内放入 `docs/img/ground/`。
 
-边建图边导航演示：
-
-![SLAM 建图与导航演示](../img/ground/slam_nav_demo.gif)
-
-RViz 占据栅格与全局/局部路径截图：
-
-![RViz 导航截图](../img/ground/slam_nav_rviz.png)
+边建图边导航演示动图与 RViz 占据栅格/全局路径截图，在完成仿真录屏后补充至 `docs/img/ground/`（`slam_nav_demo.gif`、`slam_nav_rviz.png`），并用 ScreenToGif 压缩到 10 MB 以内。
 
 ## 性能评价（多场景）
 

@@ -138,8 +138,6 @@ source install/setup.bash
 ./CarlaUE4.sh -RenderOffScreen     # 无显示器可加 -RenderOffScreen
 ```
 
-![CARLA 启动画面](../img/ground/rl_driving_carla_launch.png)
-
 ### 3. 启动 ros-bridge（部署闭环用）
 
 另开终端，拉起相机传感器与话题桥接（沿用仓库 ros-bridge）：
@@ -195,9 +193,7 @@ ros2 launch carla_rl_driving carla_rl_infer.launch.py \
 > 机器人搭载 2D 激光雷达（图中蓝色扇形扫描线），在封闭场地内按 `/cmd_vel` 速度指令自主绕圈。
 > 该仿真环境即端到端策略的训练/部署载体，与 CARLA 方案共用同一套 `env.py / models.py / train.py` 接口。
 
-训练回报曲线（PPO vs SAC，同 CNN 骨干）：
-
-![训练回报对比](../img/ground/rl_driving_reward_curve.png)
+训练回报曲线（PPO vs SAC，同 CNN 骨干）：训练与录屏完成后补充至 `docs/img/ground/rl_driving_reward_curve.png`。
 
 ## 性能评价（多场景）
 
