@@ -35,36 +35,36 @@ graph LR
 
 ### 1. 占据栅格地图（Occupancy Grid）
 
-把环境离散为栅格 $m_i$，每格用贝叶斯估计占据概率：
+把环境离散为栅格 \( m_i \)，每格用贝叶斯估计占据概率：
 
-$$
+\[
 P(m_i \mid z_{1:t}) = \left[1 + \frac{1-P(m_i\mid z_t)}{P(m_i\mid z_t)}\cdot\frac{1-P(m_i)}{P(m_i)}\cdot\frac{P(m_i\mid z_{1:t-1})}{1-P(m_i\mid z_{1:t-1})}\right]^{-1}
-$$
+\]
 
 激光每次扫描后对被命中/空闲栅格做对数几率（log-odds）更新，实现增量建图。
 
 ### 2. 位姿估计与回环
 
-RTAB-Map 用激光点云匹配估计相邻帧位姿 $\Delta T_{t-1,t}$，累积得到里程计；
+RTAB-Map 用激光点云匹配估计相邻帧位姿 \( \Delta T_{t-1,t} \)，累积得到里程计；
 当观测与历史关键帧匹配成功时触发回环，后端图优化（g2p/g2o）修正累积漂移，输出一致性 `map→odom` 修正。
 
 ### 3. 全局路径规划（A*）
 
 在占据栅格上以代价最小为目标搜索：
 
-$$
+\[
 f(n) = g(n) + h(n),\qquad h(n)=\lVert n-g\rVert_2
-$$
+\]
 
-$g(n)$ 为起点到 $n$ 的已代代价（含膨胀层代价），$h(n)$ 为到目标的欧氏启发。
+\( g(n) \) 为起点到 \( n \) 的已代代价（含膨胀层代价），\( h(n) \) 为到目标的欧氏启发。
 
 ### 4. 局部运动控制（DWB）
 
-对候选线速度 $v$ 与角速度 $\omega$ 采样，按多目标打分选最优：
+对候选线速度 \( v \) 与角速度 \( \omega \) 采样，按多目标打分选最优：
 
-$$
+\[
 C(v,\omega) = k_{\text{goal}}\cdot\text{GoalDist} + k_{\text{obs}}\cdot\text{ObsDist} + k_{\text{path}}\cdot\text{PathAlign} + k_{\text{vel}}\cdot v
-$$
+\]
 
 ## 仿真环境与步骤
 

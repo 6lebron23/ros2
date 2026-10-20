@@ -43,35 +43,35 @@ graph LR
 
 ### 1. 问题建模：马尔可夫决策过程（MDP）
 
-把驾驶建模为标准 MDP $\langle \mathcal{S}, \mathcal{A}, P, r, \gamma \rangle$：
+把驾驶建模为标准 MDP \( \langle \mathcal{S}, \mathcal{A}, P, r, \gamma \rangle \)：
 
-* 状态 $\mathcal{S}$：前视 RGB 图像 $o_t \in \mathbb{R}^{3\times H\times W}$（端到端 = 只吃图像）；
-* 动作 $\mathcal{A}$：连续动作 $a_t=[\text{steer},\ \text{accel}]$，各归一化到 $[-1,1]$；
-* 转移 $P$：由 CARLA 车辆动力学决定；
-* 折扣因子 $\gamma=0.99$。
+* 状态 \( \mathcal{S} \)：前视 RGB 图像 \( o_t \in \mathbb{R}^{3\times H\times W} \)（端到端 = 只吃图像）；
+* 动作 \( \mathcal{A} \)：连续动作 \( a_t=[\text{steer},\ \text{accel}] \)，各归一化到 \( [-1,1] \)；
+* 转移 \( P \)：由 CARLA 车辆动力学决定；
+* 折扣因子 \( \gamma=0.99 \)。
 
 ### 2. 奖励塑形公式
 
-$$
+\[
 r_t = w_v v_f - w_c |c_{\text{err}}| - w_h \theta_{\text{err}} - w_s |\delta_t|^2 - w_a |a_t| + r_{\text{speed}} - \mathbf{1}_{\text{coll}} R_{\text{coll}} - \mathbf{1}_{\text{off}} R_{\text{off}}
-$$
+\]
 
 | 项 | 含义 | 默认权重 |
 | --- | --- | --- |
-| $w_v v_f$ | 前进速度奖励（只取前向分量） | $w_v=1.0$ |
-| $w_c\|c_{\text{err}}\|$ | 横向偏离车道中心惩罚 | $w_c=0.15$ |
-| $w_h\theta_{\text{err}}$ | 车头与车道切线夹角惩罚 | $w_h=0.20$ |
-| $w_s\|\delta_t\|^2$ | 转角平滑惩罚（抑制抖动） | $w_s=0.05$ |
-| $w_a\|a_t\|$ | 急加减速惩罚 | $w_a=0.05$ |
-| $r_{\text{speed}}$ | 接近期望速度的高斯形小奖励 | $0.5\cdot\max(0,1-(v-v^\*)^2/v^{\*2})$ |
-| $\mathbf{1}_{\text{coll}}R_{\text{coll}}$ | 碰撞大惩罚并终止回合 | $10.0$ |
-| $\mathbf{1}_{\text{off}}R_{\text{off}}$ | 驶出车道惩罚 | $5.0$ |
+| \( w_v v_f \) | 前进速度奖励（只取前向分量） | \( w_v=1.0 \) |
+| \( w_c\|c_{\text{err}}\| \) | 横向偏离车道中心惩罚 | \( w_c=0.15 \) |
+| \( w_h\theta_{\text{err}} \) | 车头与车道切线夹角惩罚 | \( w_h=0.20 \) |
+| \( w_s\|\delta_t\|^2 \) | 转角平滑惩罚（抑制抖动） | \( w_s=0.05 \) |
+| \( w_a\|a_t\| \) | 急加减速惩罚 | \( w_a=0.05 \) |
+| \( r_{\text{speed}} \) | 接近期望速度的高斯形小奖励 | \( 0.5\cdot\max(0,1-(v-v^\*)^2/v^{\*2}) \) |
+| \( \mathbf{1}_{\text{coll}}R_{\text{coll}} \) | 碰撞大惩罚并终止回合 | \( 10.0 \) |
+| \( \mathbf{1}_{\text{off}}R_{\text{off}} \) | 驶出车道惩罚 | \( 5.0 \) |
 
 对应实现见 [reward.py](../../src/ground/carla_rl_driving/carla_rl_driving/reward.py)。
 
 ### 3. 策略网络结构
 
-策略 $\pi_\theta(a\mid o)$ 输出高斯分布：均值 $\mu_\theta(o)$ 与可学习对数标准差 $\log\sigma$，动作 $a\sim\mathcal{N}(\mu,\sigma^2 I)$。
+策略 \( \pi_\theta(a\mid o) \) 输出高斯分布：均值 \( \mu_\theta(o) \) 与可学习对数标准差 \( \log\sigma \)，动作 \( a\sim\mathcal{N}(\mu,\sigma^2 I) \)。
 
 ```mermaid
 graph LR
@@ -86,22 +86,22 @@ graph LR
 
 **结构消融组（CNN+GRU）**：在卷积特征后接入门控循环单元
 
-$$
+\[
 h_t = \mathrm{GRU}(\phi(o_t),\, h_{t-1}),\qquad \mu_t = W_a h_t + b_a
-$$
+\]
 
-用隐状态 $h_t$ 编码最近几帧的运动时序，弥补单帧无法判断"前车在加速还是减速"的问题。两种结构由 `models.build_policy(arch=...)` 工厂切换，见 [models.py](../../src/ground/carla_rl_driving/carla_rl_driving/models.py)。
+用隐状态 \( h_t \) 编码最近几帧的运动时序，弥补单帧无法判断"前车在加速还是减速"的问题。两种结构由 `models.build_policy(arch=...)` 工厂切换，见 [models.py](../../src/ground/carla_rl_driving/carla_rl_driving/models.py)。
 
 ### 4. RL 算法对比（同模型、不同算法）
 
 * **PPO（on-policy）**：截断目标函数
 
-$$
+\[
 L^{CLIP}(\theta)=\hat{\mathbb{E}}_t\left[\min\left(r_t(\theta)\hat{A}_t,\ \mathrm{clip}(r_t(\theta),1-\epsilon,1+\epsilon)\hat{A}_t\right)\right]
-$$
+\]
 
-其中 $r_t(\theta)=\pi_\theta(a_t|o_t)/\pi_{\theta_{old}}(a_t|o_t)$，$\epsilon=0.2$，优势 $\hat{A}_t$ 用 GAE 估计。
-* **SAC（off-policy）**：最大熵目标，在奖励中加策略熵 $\alpha\mathcal{H}(\pi(\cdot|s))$，样本效率更高、训练更稳。
+其中 \( r_t(\theta)=\pi_\theta(a_t|o_t)/\pi_{\theta_{old}}(a_t|o_t) \)，\( \epsilon=0.2 \)，优势 \( \hat{A}_t \) 用 GAE 估计。
+* **SAC（off-policy）**：最大熵目标，在奖励中加策略熵 \( \alpha\mathcal{H}(\pi(\cdot|s)) \)，样本效率更高、训练更稳。
 
 > 训练侧用 Stable-Baselines3 的 `PPO` / `SAC`，只把我们自己的 `CNNBackbone` 作为自定义 `features_extractor` 注入，算法本体不重复造轮子。
 
