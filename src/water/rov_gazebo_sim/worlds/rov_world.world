@@ -7,7 +7,7 @@
     <!-- 水下红色目标柱（ROV要追踪的） -->
     <model name="red_target">
       <static>true</static>
-      <pose>3 0 -1.0 0 0 0</pose>
+      <pose>3 0 0.5 0 0 0</pose>
       <link name="link">
         <visual name="v">
           <geometry><cylinder radius="0.2" length="1.5"/></geometry>
@@ -19,7 +19,7 @@
     <!-- 绿色障碍物 -->
     <model name="obstacle1">
       <static>true</static>
-      <pose>2 1.5 -0.5 0 0 0</pose>
+      <pose>2 1.5 0.5 0 0 0</pose>
       <link name="link">
         <visual name="v">
           <geometry><box size="0.5 0.5 1.0"/></geometry>
@@ -31,7 +31,7 @@
     <!-- 蓝色障碍物 -->
     <model name="obstacle2">
       <static>true</static>
-      <pose>2 -1.5 -0.5 0 0 0</pose>
+      <pose>2 -1.5 0.5 0 0 0</pose>
       <link name="link">
         <visual name="v">
           <geometry><box size="0.5 0.5 1.0"/></geometry>
@@ -43,7 +43,7 @@
     <!-- ROV本体 -->
     <model name="rov">
       <static>false</static>
-      <pose>0 0 -1.0 0 0 0</pose>
+      <pose>0 0 0.5 0 0 0</pose>
       <link name="base_link">
         <inertial>
           <mass>10</mass>
