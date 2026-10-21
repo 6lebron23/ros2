@@ -11,7 +11,7 @@ class HumanoidBridge(Node):
         super().__init__('humanoid_bridge')
         self.client = self.create_client(SetEntityState, '/gazebo/set_entity_state')
         self.sub = self.create_subscription(Twist, '/humanoid/cmd_vel', self.cb, 10)
-        self.model_name = self.declare_parameter('model_name', 'humanoid').value
+        self.model_name = self.declare_parameter('model_name', 'simple_humanoid').value
 
     def cb(self, msg):
         if not self.client.wait_for_service(timeout_sec=0.1): return
