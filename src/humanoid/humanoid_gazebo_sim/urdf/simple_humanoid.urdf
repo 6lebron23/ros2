@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<robot name="simple_humanoid">
+  <link name="base_link">
+    <inertial>
+      <mass value="1.0"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.02" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <geometry><box size="0.3 0.2 0.6"/></geometry>
+      <material name="white"><color rgba="0.9 0.9 0.9 1"/></material>
+    </visual>
+    <collision><geometry><box size="0.3 0.2 0.6"/></geometry></collision>
+  </link>
+  <link name="head_link">
+    <inertial>
+      <mass value="0.2"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+    </inertial>
+    <visual>
+      <geometry><sphere radius="0.1"/></geometry>
+      <material name="skin"><color rgba="0.8 0.6 0.4 1"/></material>
+    </visual>
+    <collision><geometry><sphere radius="0.1"/></geometry></collision>
+  </link>
+  <joint name="j_head" type="fixed">
+    <parent link="base_link"/><child link="head_link"/>
+    <origin xyz="0 0 0.4" rpy="0 0 0"/>
+  </joint>
+
+  <!-- 前置摄像头 -->
+  <link name="camera_link">
+    <inertial>
+      <mass value="0.05"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.00001" ixy="0" ixz="0" iyy="0.00001" iyz="0" izz="0.00001"/>
+    </inertial>
+    <visual><geometry><box size="0.03 0.03 0.03"/></geometry>
+      <material name="black"><color rgba="0 0 0 1"/></material></visual>
+    <collision><geometry><box size="0.03 0.03 0.03"/></geometry></collision>
+  </link>
+  <joint name="j_camera" type="fixed">
+    <parent link="head_link"/><child link="camera_link"/>
+    <origin xyz="0 0 0.08" rpy="0 0 0"/>
+  </joint>
+
+  <!-- 摄像头传感器：URDF 不支持 <sensor>，放在 <gazebo> 扩展，用
+       libgazebo_ros_camera 插件桥接到 ROS，发布 /humanoid/camera/image_raw -->
+  <gazebo reference="camera_link">
+    <sensor type="camera" name="camera_sensor">
+      <always_on>true</always_on>
+      <update_rate>20</update_rate>
+      <camera>
+        <horizontal_fov>1.047</horizontal_fov>
+        <image>
+          <width>320</width>
+          <height>240</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>50</far>
+        </clip>
+      </camera>
+      <plugin name="camera_plugin" filename="libgazebo_ros_camera.so">
+        <ros>
+          <namespace>/humanoid/camera</namespace>
+        </ros>
+        <frame_name>camera_link</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+</robot>
