@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <robot name="simple_humanoid">
+  <!-- 人形机器人主体 -->
   <link name="base_link">
     <inertial>
       <mass value="1.0"/>
@@ -45,8 +46,57 @@
     <origin xyz="0 0 0.08" rpy="0 0 0"/>
   </joint>
 
-  <!-- 摄像头传感器：URDF 不支持 <sensor>，放在 <gazebo> 扩展，用
-       libgazebo_ros_camera 插件桥接到 ROS，发布 /humanoid/camera/image_raw -->
+  <!-- 左轮 -->
+  <link name="left_wheel_link">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.0005" ixy="0" ixz="0" iyy="0.0005" iyz="0" izz="0.0005"/>
+    </inertial>
+    <visual><geometry><cylinder radius="0.1" length="0.06"/></geometry>
+      <material name="wheel"><color rgba="0.2 0.2 0.2 1"/></material></visual>
+    <collision><geometry><cylinder radius="0.1" length="0.06"/></geometry></collision>
+  </link>
+  <!-- 右轮 -->
+  <link name="right_wheel_link">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.0005" ixy="0" ixz="0" iyy="0.0005" iyz="0" izz="0.0005"/>
+    </inertial>
+    <visual><geometry><cylinder radius="0.1" length="0.06"/></geometry>
+      <material name="wheel"><color rgba="0.2 0.2 0.2 1"/></material></visual>
+    <collision><geometry><cylinder radius="0.1" length="0.06"/></geometry></collision>
+  </link>
+  <joint name="left_wheel_joint" type="continuous">
+    <parent link="base_link"/><child link="left_wheel_link"/>
+    <origin xyz="0 0.15 -0.25" rpy="1.5708 0 0"/>
+    <axis xyz="1 0 0"/>
+  </joint>
+  <joint name="right_wheel_joint" type="continuous">
+    <parent link="base_link"/><child link="right_wheel_link"/>
+    <origin xyz="0 -0.15 -0.25" rpy="1.5708 0 0"/>
+    <axis xyz="1 0 0"/>
+  </joint>
+
+  <!-- 差速驱动插件：订阅 /humanoid/cmd_vel 驱动左右轮 -->
+  <gazebo>
+    <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
+      <ros>
+        <namespace>/humanoid</namespace>
+      </ros>
+      <update_rate>30</update_rate>
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>0.3</wheel_separation>
+      <wheel_diameter>0.2</wheel_diameter>
+      <max_wheel_torque>20</max_wheel_torque>
+      <max_wheel_acceleration>1.0</max_wheel_acceleration>
+      <command_topic>cmd_vel</command_topic>
+    </plugin>
+  </gazebo>
+
+  <!-- 摄像头传感器：放在 <gazebo> 扩展，用 libgazebo_ros_camera 桥接到 ROS -->
   <gazebo reference="camera_link">
     <sensor type="camera" name="camera_sensor">
       <always_on>true</always_on>

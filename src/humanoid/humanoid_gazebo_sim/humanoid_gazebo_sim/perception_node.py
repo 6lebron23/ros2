@@ -11,7 +11,7 @@ class HumanoidPerception(Node):
     def __init__(self):
         super().__init__('humanoid_perception')
         self.bridge = CvBridge()
-        self.sub = self.create_subscription(Image, '/humanoid/camera/image_raw', self.cb, 10)
+        self.sub = self.create_subscription(Image, '/humanoid/camera/camera_sensor/image_raw', self.cb, 10)
         self.pub = self.create_publisher(Point, '/humanoid/target_pos', 10)
         self.lower1 = np.array([0, 80, 50])
         self.upper1 = np.array([10, 255, 255])

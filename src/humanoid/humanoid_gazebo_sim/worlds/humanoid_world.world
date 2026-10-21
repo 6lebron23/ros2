@@ -17,13 +17,5 @@
         <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Green</name></script></material>
       </visual></link>
     </model>
-    <model name="humanoid">
-      <static>false</static><pose>0 0 0.5 0 0 0</pose>
-      <link name="base_link"><visual name="v">
-        <geometry><box size="0.3 0.2 0.6"/></geometry>
-        <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material>
-      </visual>
-      <collision name="c"><geometry><box size="0.3 0.2 0.6"/></geometry></collision></link>
-    </model>
   </world>
 </sdf>
