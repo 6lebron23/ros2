@@ -137,12 +137,13 @@ python3 render_gif.py --model results/dqn_mlp1.pkl --algo dqn --episodes 1
 | reinforce_mlp1 | REINFORCE | MLP(16) | 18.75 | 0% |
 
 > 各配置训练 300 回合，最终模型用确定性策略评估 20 回合。成功率定义为评估回合中撑满最大步数（200 步）的比例。
+>
+> 说明：REINFORCE 为蒙特卡洛策略梯度方法，样本效率远低于基于经验回放与目标网络的 DQN，且对学习率与回报方差更敏感；在仅训练 300 回合的设置下尚未收敛（回报 18.75、成功率 0% 属预期现象），其曲线仅用于与 DQN 类方法做学习效率对比，不代表该方法在更多回合训练下无法收敛。
 
 ## 7. 性能评价
 
 - 以训练过程中的平均回报曲线作为学习效率指标；
-- 以最终模型的平均回报与成功率（撑满 200 步）作为算法/结构优劣指标；
-- 记录各配置的训练耗时。
+- 以最终模型的平均回报与成功率（撑满 200 步）作为算法/结构优劣指标。
 
 ## 8. 目录结构
 
@@ -163,6 +164,7 @@ src/rl_algorithm_compare/
 │   └── render_gif.py          # 渲染推理gif
 ├── launch/main.launch.py
 ├── config/algo_config.yaml
+├── results/                   # 训练曲线数据（csv）
 └── README.md
 ```
 
