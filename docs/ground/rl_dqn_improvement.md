@@ -145,8 +145,7 @@ python3 -m rl_dqn_improvement.render_gif --model results/dqn_mlp1.pkl
 ## 7. 性能评价
 
 - 以训练过程中的平均回报曲线作为学习效率指标；
-- 以最终模型的平均回报与成功率（撑满 200 步）作为算法优劣指标；
-- 记录各配置的训练耗时。
+- 以最终模型的平均回报与成功率（撑满 200 步）作为算法优劣指标。
 
 ## 8. 目录结构
 
@@ -166,6 +165,7 @@ src/rl_dqn_improvement/
 │   └── render_gif.py          # 渲染推理gif
 ├── launch/main.launch.py
 ├── config/algo_config.yaml
+├── results/                   # 训练曲线数据（csv）
 └── README.md
 ```
 
