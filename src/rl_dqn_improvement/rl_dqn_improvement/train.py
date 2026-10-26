@@ -15,6 +15,11 @@ import argparse
 import csv
 import os
 
+# 默认结果目录：包源码根目录下的 results/（不随当前工作目录漂移）
+_DEFAULT_OUT = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results')
+
+
 import numpy as np
 
 # 支持 `python3 xxx.py` 直接运行：无包上下文时把仓库 src/ 加入 sys.path
@@ -49,7 +54,7 @@ def main():
     ap.add_argument('--tag', default='dqn_mlp1')
     ap.add_argument('--episodes', type=int, default=300)
     ap.add_argument('--eval-interval', type=int, default=30)
-    ap.add_argument('--out', default='results')
+    ap.add_argument('--out', default=(_DEFAULT_OUT if os.path.isdir(_DEFAULT_OUT) else 'results'))
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
