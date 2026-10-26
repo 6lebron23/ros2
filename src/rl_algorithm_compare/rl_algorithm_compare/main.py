@@ -12,6 +12,11 @@
 """
 import argparse
 import os
+
+# 默认结果目录：包源码根目录下的 results/（不随当前工作目录漂移）
+_DEFAULT_OUT = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results')
+
 import sys
 
 from rl_algorithm_compare.compare import main as compare_main
@@ -44,7 +49,7 @@ def main():
                          'REINFORCE 600）')
     ap.add_argument('--eval-episodes', type=int, default=20,
                     help='评估回合数')
-    ap.add_argument('--out', default='results', help='结果输出目录')
+    ap.add_argument('--out', default=(_DEFAULT_OUT if os.path.isdir(_DEFAULT_OUT) else 'results'), help='结果输出目录')
     args = ap.parse_args()
 
     print('=' * 62)

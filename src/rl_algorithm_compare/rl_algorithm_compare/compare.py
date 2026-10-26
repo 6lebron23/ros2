@@ -13,6 +13,11 @@ import csv
 import glob
 import os
 
+# 默认结果目录：包源码根目录下的 results/（不随当前工作目录漂移）
+_DEFAULT_OUT = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results')
+
+
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -21,7 +26,7 @@ import matplotlib.pyplot as plt
 
 def main():
     ap = argparse.ArgumentParser(description='汇总对比结果')
-    ap.add_argument('--out', default='results')
+    ap.add_argument('--out', default=(_DEFAULT_OUT if os.path.isdir(_DEFAULT_OUT) else 'results'))
     ap.add_argument('--tags', nargs='*', default=None)
     args = ap.parse_args()
 
