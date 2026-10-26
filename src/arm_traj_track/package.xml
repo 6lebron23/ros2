@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>arm_traj_track</name>
+  <version>0.1.0</version>
+  <description>MuJoCo 3 关节平面机械臂连续轨迹跟踪：感知 → MLP 神经网络 → 闭环扭矩控制（监督学习 + DAgger）。</description>
+  <maintainer email="6lebron23@users.noreply.github.com">6lebron23</maintainer>
+  <license>MIT</license>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>numpy</exec_depend>
+  <exec_depend>mujoco</exec_depend>
+  <exec_depend>matplotlib</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

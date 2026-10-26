@@ -103,6 +103,7 @@ ROS 2 话题发布订阅基础实验（talker/listener）：[chap2/ros2_pubsub_p
 * [车辆键盘遥操作与二维模拟](./ground/vehicle_pygame_teleop.md)
 * [MuJoCo 差速小车轮滑感知与轨迹补偿](./ground/mujoco_diff_drive_slip_compensation.md)
 * [MuJoCo 地面小车射线感知与分级减速避障](./ground/mujoco_car_avoidance.md)
+* [MuJoCo 3关节机械臂连续轨迹跟踪（感知→MLP→闭环控制）](./ground/arm_traj_track.md)
 * [2D 小车目标追踪仿真](./ground/car_2d_target_tracker.md)
 * [基于神经网络的无人小车自适应跟车（ACC）](./ground/carla_nn_car_following.md)
 * [恶劣雨雾天气下多传感器感知性能对比实验](./ground/weather_perception_benchmark.md)
