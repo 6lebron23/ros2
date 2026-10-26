@@ -5,11 +5,16 @@
   python3 -m rl_dqn_improvement.evaluate --model results/dqn_mlp1.pkl
 """
 import argparse
+import os
 
 import numpy as np
 
-from .cartpole_env import CartPoleEnv
-from .dqn import DQN
+# 支持 `python3 xxx.py` 直接运行：无包上下文时把仓库 src/ 加入 sys.path
+if __package__ in (None, ''):
+    import sys
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from rl_dqn_improvement.cartpole_env import CartPoleEnv
 
 
 def main():

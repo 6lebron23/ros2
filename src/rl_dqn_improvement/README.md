@@ -24,6 +24,13 @@ DQN 系算法：
 python3 -m pip install --user mujoco==2.3.7 numpy matplotlib pillow
 ```
 
+## 一键运行
+
+```bash
+python3 -m rl_dqn_improvement.main
+# 安装后也可直接：ros2 run rl_dqn_improvement main
+```
+
 ## 训练 / 评估 / 对比
 
 ```bash

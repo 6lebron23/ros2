@@ -27,6 +27,7 @@ setup(
             'evaluate = rl_dqn_improvement.evaluate:main',
             'compare = rl_dqn_improvement.compare:main',
             'render_gif = rl_dqn_improvement.render_gif:main',
+            'main = rl_dqn_improvement.main:main',
         ],
     },
 )

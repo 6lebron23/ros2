@@ -100,7 +100,17 @@ ros2 launch rl_dqn_improvement main.launch.py
 ros2 launch rl_dqn_improvement main.launch.py variant:=double tag:=double_mlp1 episodes:=300
 ```
 
-### 5.4 直接运行脚本
+### 5.4 一键运行（推荐）
+
+一条命令完成"训练 3 个对比项 → 评估 → 汇总对比"全流程：
+
+```bash
+cd ~/ros2_ws/src/rl_dqn_improvement
+python3 -m rl_dqn_improvement.main
+# 安装后也可直接：ros2 run rl_dqn_improvement main
+```
+
+### 5.5 直接运行脚本
 
 ```bash
 # 训练 3 个对比项
@@ -162,7 +172,8 @@ src/rl_dqn_improvement/
 │   ├── train.py               # 训练 + 记录曲线
 │   ├── evaluate.py            # 评估模型
 │   ├── compare.py             # 汇总对比曲线与表格
-│   └── render_gif.py          # 渲染推理gif
+│   ├── render_gif.py          # 渲染推理gif
+│   └── main.py                # 一键运行全流程入口
 ├── launch/main.launch.py
 ├── config/algo_config.yaml
 ├── results/                   # 训练曲线数据（csv）
