@@ -11,6 +11,7 @@
 import argparse
 import os
 import pickle
+import sys
 
 import numpy as np
 import matplotlib
@@ -19,9 +20,13 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from PIL import Image
 
-from .cartpole_env import CartPoleEnv
-from .dqn import DQN
-from .reinforce import REINFORCE
+# 支持 `python3 render_gif.py` 直接运行
+if __package__ in (None, ''):
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from rl_algorithm_compare.cartpole_env import CartPoleEnv
+from rl_algorithm_compare.dqn import DQN
+from rl_algorithm_compare.reinforce import REINFORCE
 
 
 def _draw_state(obs):
@@ -47,11 +52,25 @@ def _draw_state(obs):
     return buf[..., :3].copy()
 
 
-def _try_mujoco_frame(env, use_mujoco):
+def _set_env_state(env, obs):
+    """把 MuJoCo 环境状态设置到 obs 对应的位形（渲染用）。"""
+    env.data.qpos[0] = obs[0]
+    env.data.qvel[0] = obs[1]
+    env.data.qpos[1] = obs[2]
+    env.data.qvel[1] = obs[3]
+    mujoco.mj_forward(env.model, env.data)
+
+
+def _try_mujoco_frame(env, use_mujoco, obs):
     if not use_mujoco:
         return None, False
     try:
-        return env.render_frame(), True
+        _set_env_state(env, obs)
+        frame = env.render_frame()
+        # 无 OpenGL 时 mujoco 可能返回全黑帧但不抛异常；检测到视为渲染失败
+        if float(np.asarray(frame).mean()) < 1.0:
+            return None, False
+        return frame, True
     except Exception:
         return None, False
 
@@ -69,8 +88,9 @@ def load_agent(path, algo):
     return agent.load(path)
 
 
-def render(agent, env, path, episodes=1, fps=30, use_mujoco=True):
+def render(agent, env, path, episodes=1, fps=30, renderer='auto'):
     frames = []
+    use_mujoco = renderer in ('auto', 'mujoco')
     for _ in range(episodes):
         s = env.reset()
         done, traj = False, []
@@ -82,7 +102,10 @@ def render(agent, env, path, episodes=1, fps=30, use_mujoco=True):
         # 降采样控制 gif 帧数（<10MB）
         stride = max(1, len(traj) // 150)
         for obs in traj[::stride]:
-            frame, ok = _try_mujoco_frame(env, use_mujoco)
+            if renderer == 'matplotlib':
+                frames.append(_draw_state(obs))
+                continue
+            frame, ok = _try_mujoco_frame(env, use_mujoco, obs)
             if ok:
                 frames.append(frame)
             else:
@@ -103,12 +126,15 @@ def main():
     ap.add_argument('--algo', default='dqn', choices=['dqn', 'reinforce'])
     ap.add_argument('--episodes', type=int, default=1)
     ap.add_argument('--out', default='results')
+    ap.add_argument('--renderer', default='auto',
+                    choices=['auto', 'mujoco', 'matplotlib'],
+                    help='渲染后端：auto 自动降级（默认）、mujoco、matplotlib')
     args = ap.parse_args()
 
     env = CartPoleEnv()
     agent = load_agent(args.model, args.algo)
     out = os.path.join(args.out, os.path.basename(args.model)[:-4] + '.gif')
-    render(agent, env, out, episodes=args.episodes)
+    render(agent, env, out, episodes=args.episodes, renderer=args.renderer)
 
 
 if __name__ == '__main__':

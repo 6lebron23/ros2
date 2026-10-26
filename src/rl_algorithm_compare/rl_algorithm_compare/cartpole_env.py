@@ -18,7 +18,13 @@ class CartPoleEnv:
 
     def __init__(self, xml_path=None, max_steps=200):
         self.xml = xml_path or XML_PATH
-        self.model = mujoco.MjModel.from_xml_path(self.xml)
+        # 优先按路径加载；若因路径含非 ASCII 字符（如 Windows 中文目录）
+        # 导致 from_xml_path 打不开，退回按内容加载，保证任何路径可运行。
+        try:
+            self.model = mujoco.MjModel.from_xml_path(self.xml)
+        except Exception:
+            with open(self.xml, 'r', encoding='utf-8') as f:
+                self.model = mujoco.MjModel.from_xml_string(f.read())
         self.data = mujoco.MjData(self.model)
         self.max_steps = max_steps
         self.steps = 0

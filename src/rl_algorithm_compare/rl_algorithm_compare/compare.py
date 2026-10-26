@@ -28,7 +28,8 @@ def main():
     if args.tags:
         csv_files = [os.path.join(args.out, t + '.csv') for t in args.tags]
     else:
-        csv_files = sorted(glob.glob(os.path.join(args.out, '*.csv')))
+        csv_files = [f for f in sorted(glob.glob(os.path.join(args.out, '*.csv')))
+                     if os.path.basename(f) != 'compare_summary.csv']
 
     if not csv_files:
         print('[compare] 没有找到 csv，请先运行 train.py')

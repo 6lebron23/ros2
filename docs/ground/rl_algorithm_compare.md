@@ -49,7 +49,9 @@ REINFORCE 直接对策略 \(\pi_\theta\) 求梯度，用完整回合的折扣回
 \nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t} G_t \nabla_\theta \log \pi_\theta(a_t|s_t) \right]
 \]
 
-其中折扣回报 \(G_t = \sum_{k=0}^{T-t} \gamma^k r_{t+k}\)。本实现减去回报均值作为基线以降低方差。
+其中折扣回报 \(G_t = \sum_{k=0}^{T-t} \gamma^k r_{t+k}\)。由于 CartPole 每步奖励恒为 1，单条轨迹内的
+回报均值无法区分动作好坏，本实现改用**跨回合回报基线**（running baseline，指数移动平均）来降低方差：
+高于平均回报的回合获得正优势（鼓励），低于平均回报的回合获得负优势（抑制）。
 
 ### 3.3 网络结构
 
@@ -96,13 +98,25 @@ ros2 launch rl_algorithm_compare main.launch.py
 ros2 launch rl_algorithm_compare main.launch.py algo:=reinforce tag:=reinforce_mlp1
 ```
 
-### 5.4 直接运行脚本
+### 5.4 一键运行（推荐）
+
+在包目录执行一条命令即可完成"训练 3 个对比项 → 评估 → 汇总对比"全流程：
 
 ```bash
-# 训练 3 个对比项
+cd ~/ros2_ws/src/rl_algorithm_compare
+python3 -m rl_algorithm_compare.main --episodes 600
+# 安装后也可直接：ros2 run rl_algorithm_compare main
+```
+
+### 5.5 直接运行脚本
+
+```bash
+cd ~/ros2_ws/src/rl_algorithm_compare/rl_algorithm_compare
+
+# 训练 3 个对比项（脚本已做包路径引导，可直接 python3 xxx.py 运行）
 python3 train.py --algo dqn       --layers 16    --tag dqn_mlp1      --episodes 300
 python3 train.py --algo dqn       --layers 16,16 --tag dqn_mlp2      --episodes 300
-python3 train.py --algo reinforce --layers 16    --tag reinforce_mlp1 --episodes 300
+python3 train.py --algo reinforce --layers 16    --tag reinforce_mlp1 --episodes 600
 
 # 评估
 python3 evaluate.py --model results/dqn_mlp1.pkl --algo dqn --episodes 20
@@ -134,11 +148,11 @@ python3 render_gif.py --model results/dqn_mlp1.pkl --algo dqn --episodes 1
 |------|------|----------|--------------|--------|
 | dqn_mlp1 | DQN | MLP(16) | 198.70 | 90% |
 | dqn_mlp2 | DQN | MLP(16,16) | 200.00 | 100% |
-| reinforce_mlp1 | REINFORCE | MLP(16) | 18.75 | 0% |
+| reinforce_mlp1 | REINFORCE | MLP(16) | 198.25 | 90% |
 
-> 各配置训练 300 回合，最终模型用确定性策略评估 20 回合。成功率定义为评估回合中撑满最大步数（200 步）的比例。
->
-> 说明：REINFORCE 为蒙特卡洛策略梯度方法，样本效率远低于基于经验回放与目标网络的 DQN，且对学习率与回报方差更敏感；在仅训练 300 回合的设置下尚未收敛（回报 18.75、成功率 0% 属预期现象），其曲线仅用于与 DQN 类方法做学习效率对比，不代表该方法在更多回合训练下无法收敛。
+> 各配置训练后，最终模型用确定性策略评估 20 回合。成功率定义为评估回合中撑满最大步数（200 步）的比例。
+> 表内数值为本地评估结果：dqn_mlp1/dqn_mlp2 训练 300 回合；REINFORCE 训练 600 回合（由于收敛较慢，
+> 训练回合数取 600，学习曲线见 6.1）。
 
 ## 7. 性能评价
 
@@ -153,6 +167,7 @@ src/rl_algorithm_compare/
 ├── setup.py
 ├── setup.cfg
 ├── models/cartpole.xml        # MuJoCo 环境模型
+├── resource/rl_algorithm_compare  # ament_python 资源标记
 ├── rl_algorithm_compare/
 │   ├── cartpole_env.py        # MuJoCo 环境封装
 │   ├── nn.py                  # NumPy MLP + Adam
@@ -161,10 +176,11 @@ src/rl_algorithm_compare/
 │   ├── train.py               # 训练 + 记录曲线
 │   ├── evaluate.py            # 评估模型
 │   ├── compare.py             # 汇总对比曲线与表格
-│   └── render_gif.py          # 渲染推理gif
+│   ├── render_gif.py          # 渲染推理gif
+│   └── main.py                # 一键运行全流程入口
 ├── launch/main.launch.py
 ├── config/algo_config.yaml
-├── results/                   # 训练曲线数据（csv）
+├── results/                   # 训练曲线数据（csv）+ 训练好的模型（pkl）
 └── README.md
 ```
 
@@ -188,11 +204,12 @@ def step(self, a):
 实现 MLP 前向、反向与 Adam 更新。反向传播核心（softmax 输出的策略梯度）：
 
 ```python
-# REINFORCE: dy = (one_hot - prob) * G[:, None]
+# REINFORCE: 策略梯度上升需 theta += lr*grad；adam_update 为 theta -= lr*grad，
+#            故传入负梯度 dy = (prob - one_hot) * adv，配合跨回合基线 adv
 prob, _ = self.policy.forward(X)
 one_hot = np.zeros_like(prob)
 one_hot[np.arange(len(A)), A] = 1
-dy = (one_hot - prob) * G[:, None]
+dy = (prob - one_hot) * adv[:, None]      # adv = G - baseline（跨回合）
 gW, gb = self.policy.backward(X, dy)
 self.policy.adam_update(gW, gb)
 ```

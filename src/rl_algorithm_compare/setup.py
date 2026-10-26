@@ -26,6 +26,7 @@ setup(
             'evaluate = rl_algorithm_compare.evaluate:main',
             'compare = rl_algorithm_compare.compare:main',
             'render_gif = rl_algorithm_compare.render_gif:main',
+            'main = rl_algorithm_compare.main:main',
         ],
     },
 )

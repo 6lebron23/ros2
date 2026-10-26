@@ -29,9 +29,21 @@ source install/setup.bash
 ros2 launch rl_algorithm_compare main.launch.py
 ```
 
-### 方式二：直接运行脚本
+### 方式二：一键运行（推荐）
 
 ```bash
+cd ~/ros2_ws/src/rl_algorithm_compare
+python3 -m rl_algorithm_compare.main --episodes 600
+# 安装后也可：ros2 run rl_algorithm_compare main
+```
+
+### 方式三：直接运行脚本
+
+脚本已做包路径引导（`sys.path`），可直接运行：
+
+```bash
+cd ~/ros2_ws/src/rl_algorithm_compare/rl_algorithm_compare
+
 # 训练 3 个对比项
 python3 train.py --algo dqn       --layers 16    --tag dqn_mlp1      --episodes 600
 python3 train.py --algo dqn       --layers 16,16 --tag dqn_mlp2      --episodes 600
@@ -43,7 +55,7 @@ python3 evaluate.py --model results/dqn_mlp1.pkl --algo dqn --episodes 20
 # 汇总对比（学习曲线图 + 对比表）
 python3 compare.py --out results
 
-# 渲染推理 gif
+# 渲染推理 gif（无 OpenGL 环境自动降级到 matplotlib 绘制）
 python3 render_gif.py --model results/dqn_mlp1.pkl --algo dqn --episodes 1
 ```
 

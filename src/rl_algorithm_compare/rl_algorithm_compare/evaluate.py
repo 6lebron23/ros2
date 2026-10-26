@@ -5,13 +5,19 @@
   python3 evaluate.py --model results/dqn_mlp1.pkl --algo dqn --episodes 20
 """
 import argparse
+import os
 import pickle
+import sys
 
 import numpy as np
 
-from .cartpole_env import CartPoleEnv
-from .dqn import DQN
-from .reinforce import REINFORCE
+# 支持 `python3 evaluate.py` 直接运行
+if __package__ in (None, ''):
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from rl_algorithm_compare.cartpole_env import CartPoleEnv
+from rl_algorithm_compare.dqn import DQN
+from rl_algorithm_compare.reinforce import REINFORCE
 
 
 def load_agent(path, algo):

@@ -13,12 +13,17 @@
 import argparse
 import csv
 import os
+import sys
 
 import numpy as np
 
-from .cartpole_env import CartPoleEnv
-from .dqn import DQN
-from .reinforce import REINFORCE
+# 支持 `python3 train.py` 直接运行：无包上下文时把仓库 src/ 加入 sys.path
+if __package__ in (None, ''):
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from rl_algorithm_compare.cartpole_env import CartPoleEnv
+from rl_algorithm_compare.dqn import DQN
+from rl_algorithm_compare.reinforce import REINFORCE
 
 ALGOS = {'dqn': DQN, 'reinforce': REINFORCE}
 
@@ -86,7 +91,7 @@ def main():
     print('[train] 模型已保存: %s' % model_path)
 
     if args.render_gif:
-        from . import render_gif
+        from rl_algorithm_compare import render_gif
         render_gif.render(agent, env,
                           os.path.join(args.out, f'{args.tag}.gif'),
                           episodes=args.gif_episodes)
