@@ -15,7 +15,12 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from PIL import Image
 
-from .cartpole_env import CartPoleEnv
+# 支持 `python3 render_gif.py` 直接运行：无包上下文时把仓库 src/ 加入 sys.path
+if __package__ in (None, ''):
+    import sys
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from rl_dqn_improvement.cartpole_env import CartPoleEnv
 from .dqn import DQN
 
 
