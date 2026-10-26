@@ -104,8 +104,9 @@ ros2 launch rl_algorithm_compare main.launch.py algo:=reinforce tag:=reinforce_m
 
 ```bash
 cd ~/ros2_ws/src/rl_algorithm_compare
-python3 -m rl_algorithm_compare.main --episodes 600
+python3 -m rl_algorithm_compare.main
 # 安装后也可直接：ros2 run rl_algorithm_compare main
+# 默认回合数：DQN 300，REINFORCE 600（收敛较慢）
 ```
 
 ### 5.5 直接运行脚本

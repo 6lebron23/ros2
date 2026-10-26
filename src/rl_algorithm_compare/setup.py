@@ -13,11 +13,12 @@ setup(
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/launch', glob('launch/*.launch.py')),
         ('share/' + package_name + '/config', glob('config/*.yaml')),
+        ('share/' + package_name + '/models', glob('models/*.xml')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='6lebron23',
-    maintainer_email='6lebron23@todo.todo',
+    maintainer_email='3248146937@qq.com',
     description='在 MuJoCo CartPole 上用纯NumPy神经网络实现RL算法与网络结构对比（DQN/REINFORCE、单双层MLP）',
     license='MIT',
     entry_points={

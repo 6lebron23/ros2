@@ -20,9 +20,9 @@ from rl_algorithm_compare.train import main as train_main
 
 # 三个对比项：(算法, 隐藏层, 结果标签)
 JOBS = [
-    ('dqn', '16', 'dqn_mlp1'),
-    ('dqn', '16,16', 'dqn_mlp2'),
-    ('reinforce', '16', 'reinforce_mlp1'),
+    ('dqn', '16', 'dqn_mlp1', 300),
+    ('dqn', '16,16', 'dqn_mlp2', 300),
+    ('reinforce', '16', 'reinforce_mlp1', 600),  # 收敛较慢，默认多训
 ]
 
 
@@ -39,8 +39,9 @@ def _run(fn, argv):
 def main():
     ap = argparse.ArgumentParser(
         description='一键运行 RL 算法与网络结构对比全流程')
-    ap.add_argument('--episodes', type=int, default=600,
-                    help='每个对比项的训练回合数')
+    ap.add_argument('--episodes', type=int, default=None,
+                    help='训练回合数；不指定则按对比项默认（DQN 300，'
+                         'REINFORCE 600）')
     ap.add_argument('--eval-episodes', type=int, default=20,
                     help='评估回合数')
     ap.add_argument('--out', default='results', help='结果输出目录')
@@ -48,13 +49,15 @@ def main():
 
     print('=' * 62)
     print('步骤 1/3：训练 3 个对比项')
-    print('  DQN-MLP16 / DQN-MLP(16,16) / REINFORCE-MLP16，各 %d 回合'
-          % args.episodes)
+    print('  DQN-MLP16 / DQN-MLP(16,16) / REINFORCE-MLP16'
+          + ('，各 %d 回合' % args.episodes if args.episodes
+             else '（默认回合数：DQN 300，REINFORCE 600）'))
     print('=' * 62)
-    for algo, layers, tag in JOBS:
+    for algo, layers, tag, default_ep in JOBS:
+        ep = args.episodes if args.episodes is not None else default_ep
         _run(train_main,
              ['train.py', '--algo', algo, '--layers', layers, '--tag', tag,
-              '--episodes', str(args.episodes), '--out', args.out])
+              '--episodes', str(ep), '--out', args.out])
 
     print('=' * 62)
     print('步骤 2/3：评估各模型')

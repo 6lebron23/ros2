@@ -9,8 +9,28 @@ import os
 import numpy as np
 import mujoco
 
-XML_PATH = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), '..', 'models', 'cartpole.xml')
+def _find_xml():
+    """定位 cartpole.xml：优先安装后的 share 目录，其次源码相对路径。
+
+    普通 `colcon build`（非 --symlink-install）会把 Python 包复制进
+    site-packages，此时 __file__ 附近没有 models/；模型目录由 setup.py
+    的 data_files 安装到 share/rl_algorithm_compare/models/，因此安装后
+    优先从 ament 资源索引解析。直接在源码树运行（python3 train.py）时
+    ament 索引可能不存在，回退到源码相对路径。
+    """
+    try:
+        from ament_index_python.packages import get_package_share_directory
+        p = os.path.join(get_package_share_directory('rl_algorithm_compare'),
+                         'models', 'cartpole.xml')
+        if os.path.exists(p):
+            return p
+    except Exception:
+        pass
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        '..', 'models', 'cartpole.xml')
+
+
+XML_PATH = _find_xml()
 
 
 class CartPoleEnv:

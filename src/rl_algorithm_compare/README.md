@@ -33,8 +33,9 @@ ros2 launch rl_algorithm_compare main.launch.py
 
 ```bash
 cd ~/ros2_ws/src/rl_algorithm_compare
-python3 -m rl_algorithm_compare.main --episodes 600
+python3 -m rl_algorithm_compare.main
 # 安装后也可：ros2 run rl_algorithm_compare main
+# 默认回合数：DQN 300，REINFORCE 600（收敛较慢）
 ```
 
 ### 方式三：直接运行脚本
@@ -45,8 +46,8 @@ python3 -m rl_algorithm_compare.main --episodes 600
 cd ~/ros2_ws/src/rl_algorithm_compare/rl_algorithm_compare
 
 # 训练 3 个对比项
-python3 train.py --algo dqn       --layers 16    --tag dqn_mlp1      --episodes 600
-python3 train.py --algo dqn       --layers 16,16 --tag dqn_mlp2      --episodes 600
+python3 train.py --algo dqn       --layers 16    --tag dqn_mlp1      --episodes 300
+python3 train.py --algo dqn       --layers 16,16 --tag dqn_mlp2      --episodes 300
 python3 train.py --algo reinforce --layers 16    --tag reinforce_mlp1 --episodes 600
 
 # 评估
